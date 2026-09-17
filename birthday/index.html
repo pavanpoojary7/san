@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Surprise for San</title>
+<meta name="description" content="Someone made something special for San. Open it!">
+<meta property="og:title" content="Psst, San! Something special is waiting for you 🎁">
+<meta property="og:image" content="san-2.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@500;700;800&family=Gochi+Hand&display=swap">
+<style>
+  /* Palette borrowed from San's marigold-and-violet outfit, made candy-sweet. */
+  :root {
+    --cream: #FFF6E3;
+    --marigold: #F6B90F;
+    --marigold-soft: #FFE08A;
+    --violet: #6A2BD9;
+    --violet-soft: #E7DAFF;
+    --pink: #FF4F9A;
+    --pink-soft: #FFD6E8;
+    --ink: #2B1745;
+    --display: "Chewy", "Comic Sans MS", "Trebuchet MS", cursive;
+    --body: "Nunito", "Segoe UI", system-ui, sans-serif;
+    --hand: "Gochi Hand", "Segoe Print", cursive;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 1.05rem;
+    line-height: 1.55;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(circle, rgba(106,43,217,.13) 0 2.5px, transparent 3.5px),
+      radial-gradient(circle, rgba(246,185,15,.28) 0 3px, transparent 4px);
+    background-size: 46px 46px, 46px 46px;
+    background-position: 0 0, 23px 23px;
+  }
+  #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+  /* Floating balloons in the background */
+  .balloons { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  .balloon {
+    position: absolute; bottom: -140px;
+    width: 54px; height: 66px;
+    border-radius: 50% 50% 46% 46%;
+    background: var(--b);
+    opacity: .55;
+    animation: rise var(--t) linear infinite;
+    animation-delay: var(--d);
+  }
+  .balloon::after {
+    content: ""; position: absolute; left: 50%; top: 100%;
+    width: 1.5px; height: 60px; background: rgba(43,23,69,.35);
+  }
+  @keyframes rise {
+    0% { transform: translate(0, 0) rotate(-4deg); }
+    50% { transform: translate(24px, -60vh) rotate(5deg); }
+    100% { transform: translate(-10px, -125vh) rotate(-4deg); }
+  }
+
+  /* Screens */
+  .screen {
+    position: relative; z-index: 1;
+    min-height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 28px 16px 40px;
+    text-align: center;
+  }
+  .screen[hidden] { display: none !important; }
+  .screen.enter { animation: pop-in .55s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes pop-in { from { opacity: 0; transform: scale(.85) translateY(20px); } to { opacity: 1; transform: none; } }
+
+  .card {
+    width: 100%; max-width: 520px;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 28px;
+    box-shadow: 0 8px 0 var(--ink);
+    padding: clamp(22px, 6vw, 38px);
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+  }
+
+  .sticker { font-size: 4.2rem; line-height: 1; display: inline-block; animation: wiggle 1.8s ease-in-out infinite; }
+  @keyframes wiggle { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg) scale(1.06); } }
+
+  h1, h2 {
+    font-family: var(--display); font-weight: 400;
+    margin: 0; line-height: 1.02; text-wrap: balance;
+    letter-spacing: .01em;
+  }
+  h1 { font-size: clamp(2.4rem, 9vw, 3.6rem); color: var(--violet); }
+  h2 { font-size: clamp(2rem, 7.5vw, 2.8rem); color: var(--violet); }
+  .name { color: var(--pink); }
+  p { margin: 0; max-width: 42ch; }
+  .lead { font-size: 1.15rem; font-weight: 700; }
+  .scribble { font-family: var(--hand); font-size: 1.45rem; color: var(--pink); line-height: 1.2; }
+  .tease { min-height: 1.8em; font-family: var(--hand); font-size: 1.5rem; color: var(--violet); }
+
+  .btn-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 6px; min-height: 64px; }
+  .btn {
+    font: 800 1.15rem var(--body);
+    padding: 14px 30px;
+    border-radius: 999px;
+    border: 3px solid var(--ink);
+    box-shadow: 0 5px 0 var(--ink);
+    cursor: pointer;
+    background: var(--marigold);
+    color: var(--ink);
+    transition: transform .15s, box-shadow .15s, left .45s cubic-bezier(.3,1.5,.5,1), top .45s cubic-bezier(.3,1.5,.5,1);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
+  .btn:focus-visible { outline: 3px dashed var(--pink); outline-offset: 4px; }
+  .btn.yes { background: var(--pink); color: #fff; }
+  .btn.no { background: var(--violet-soft); }
+  .btn.violet { background: var(--violet); color: #fff; }
+  .btn.floating { position: fixed; z-index: 20; margin: 0; }
+
+  /* Gift */
+  .gift { position: relative; width: 170px; height: 170px; cursor: pointer; background: none; border: 0; padding: 0; margin: 10px auto 4px; }
+  .gift:focus-visible { outline: 3px dashed var(--pink); outline-offset: 6px; border-radius: 16px; }
+  .gift .box {
+    position: absolute; left: 10px; right: 10px; bottom: 0; height: 110px;
+    background: var(--violet); border: 3px solid var(--ink); border-radius: 10px;
+  }
+  .gift .lid {
+    position: absolute; left: 0; right: 0; top: 30px; height: 40px;
+    background: var(--pink); border: 3px solid var(--ink); border-radius: 10px;
+    transition: transform .6s cubic-bezier(.3,1.6,.5,1);
+    z-index: 2;
+  }
+  .gift .ribbon-v { position: absolute; left: 50%; width: 26px; top: 30px; bottom: 0; transform: translateX(-50%); background: var(--marigold); border-inline: 3px solid var(--ink); z-index: 3; }
+  .gift .bow { position: absolute; left: 50%; top: 0; transform: translateX(-50%); font-size: 2.6rem; line-height: 1; z-index: 4; transition: transform .6s; }
+  .gift { animation: shake 1.6s ease-in-out infinite; }
+  @keyframes shake {
+    0%, 70%, 100% { transform: rotate(0); }
+    76% { transform: rotate(-7deg); } 82% { transform: rotate(7deg); } 88% { transform: rotate(-5deg); } 94% { transform: rotate(4deg); }
+  }
+  .gift.open { animation: none; }
+  .gift.open .lid, .gift.open .ribbon-v, .gift.open .bow { transform: translate(-10px, -90px) rotate(-25deg); }
+  .gift.open .ribbon-v { transform: translate(-50%, 200px); opacity: 0; transition: .4s; }
+
+  /* Wish list */
+  .wishes { list-style: none; padding: 0; margin: 4px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .wishes li {
+    font-weight: 800; font-size: .92rem;
+    padding: 6px 14px; border-radius: 999px; border: 2px solid var(--ink);
+    background: var(--marigold-soft);
+  }
+  .wishes li:nth-child(2) { background: var(--pink-soft); }
+  .wishes li:nth-child(3) { background: var(--violet-soft); }
+
+  /* Monkeys */
+  .monkeys { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; }
+  .monkey {
+    background: var(--cream); border: 2.5px solid var(--ink); border-radius: 20px;
+    padding: 14px 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .monkey .face { font-size: 3.2rem; line-height: 1; animation: bounce 1.2s ease-in-out infinite; }
+  .monkey:nth-child(2) .face { animation-delay: .15s; }
+  .monkey:nth-child(3) .face { animation-delay: .3s; }
+  .monkey:nth-child(4) .face { animation: dance .7s ease-in-out infinite alternate; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes dance { from { transform: rotate(-14deg) translateY(0); } to { transform: rotate(14deg) translateY(-6px); } }
+  .monkey b { font-family: var(--display); font-weight: 400; font-size: 1.25rem; color: var(--violet); line-height: 1.1; }
+  .monkey span { font-size: .85rem; font-weight: 700; opacity: .8; }
+
+  /* Photos */
+  .gallery { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .polaroid {
+    background: #fff; padding: 10px 10px 0; border: 2.5px solid var(--ink);
+    box-shadow: 0 6px 0 var(--ink); width: min(220px, 42vw); margin: 0;
+    transform: rotate(-4deg); transition: transform .3s;
+  }
+  .polaroid:nth-child(2) { transform: rotate(4deg); }
+  .polaroid:hover { transform: rotate(0) scale(1.04); }
+  .polaroid img { display: block; width: 100%; max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: top; }
+  .polaroid figcaption { font-family: var(--hand); font-size: 1.15rem; padding: 6px 2px 8px; line-height: 1.15; }
+
+  /* Mini cake */
+  .cake { position: relative; width: 190px; height: 150px; margin: 6px auto 0; }
+  .cake .layer { position: absolute; left: 50%; transform: translateX(-50%); border: 3px solid var(--ink); }
+  .cake .l1 { bottom: 10px; width: 180px; height: 58px; background: var(--violet); border-radius: 14px; }
+  .cake .l2 { bottom: 64px; width: 130px; height: 46px; background: var(--pink-soft); border-radius: 12px; }
+  .cake .plate { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 190px; height: 16px; background: var(--marigold); border: 3px solid var(--ink); border-radius: 50%; }
+  .candles { position: absolute; bottom: 106px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; }
+  .candle { position: relative; width: 14px; height: 36px; background: repeating-linear-gradient(135deg, var(--marigold) 0 5px, #fff 5px 9px); border: 2px solid var(--ink); border-radius: 4px 4px 0 0; cursor: pointer; padding: 0; }
+  .candle::before { content: ""; position: absolute; inset: -30px -14px 0; } /* bigger tap target */
+  .candle .flame {
+    position: absolute; left: 50%; bottom: 100%; width: 14px; height: 22px; margin-bottom: 4px;
+    transform: translateX(-50%); transform-origin: 50% 100%;
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: radial-gradient(ellipse at 50% 75%, #fff 0 18%, #FFD34E 42%, #FF7A2F 78%, transparent 80%);
+    animation: flicker .9s ease-in-out infinite alternate;
+  }
+  @keyframes flicker { from { transform: translateX(-50%) rotate(-4deg) scale(1); } to { transform: translateX(-50%) rotate(4deg) scale(.9, 1.1); } }
+  .candle.out .flame { opacity: 0; transition: opacity .2s; animation: none; }
+
+  .dots { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 30; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink); background: #fff; transition: background .3s, width .3s; }
+  .dots i.on { background: var(--pink); width: 24px; border-radius: 99px; }
+
+  .final { font-family: var(--display); font-size: clamp(1.5rem, 5.5vw, 2rem); color: var(--pink); line-height: 1.15; }
+
+  @media (max-width: 420px) {
+    .monkey .face { font-size: 2.6rem; }
+    .gallery { gap: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="balloons" id="balloons" aria-hidden="true"></div>
+<nav class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></nav>
+
+<!-- 1. The question -->
+<section class="screen" id="s1">
+  <div class="card">
+    <span class="sticker" aria-hidden="true">💌</span>
+    <h1>Hey <span class="name">San</span>!</h1>
+    <p class="lead">Someone made something special, just for you.</p>
+    <p class="scribble">Are you excited to open it?</p>
+    <div class="btn-row" id="btnRow">
+      <button class="btn yes" id="yesBtn" type="button">Yes! 😍</button>
+      <button class="btn no" id="noBtn" type="button">No 😒</button>
+    </div>
+    <p class="tease" id="tease" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- 2. Aww -->
+<section class="screen" id="s2" hidden>
+  <div class="card">
+    <span class="sticker" aria-hidden="true">🥹</span>
+    <h2>Awww, you're excited!</h2>
+    <p class="lead">I knew it. Nobody can resist a surprise.</p>
+    <p class="scribble">Go on, tap the gift. It won't bite. Probably.</p>
+    <button class="gift" id="gift" type="button" aria-label="Open the gift">
+      <span class="box"></span><span class="ribbon-v"></span><span class="lid"></span><span class="bow">🎀</span>
+    </button>
+  </div>
+</section>
+
+<!-- 3. The wish -->
+<section class="screen" id="s3" hidden>
+  <div class="card">
+    <span class="sticker" aria-hidden="true">🎂</span>
+    <h1>Happy Birthday, <span class="name">San!</span></h1>
+    <p class="lead">Today the world got a little brighter, a little louder and a whole lot cuter, because it's <em>your</em> day!</p>
+    <p>May your smile stay bigger than your slice of cake, your happiness last longer than your phone battery, and your worries vanish faster than snacks at a party.</p>
+    <ul class="wishes" aria-label="Wishes for San">
+      <li>Endless smiles 😊</li><li>Lots of happiness 💖</li><li>Good health 🌸</li><li>Unlimited cake 🍰</li>
+    </ul>
+    <p class="scribble">Never stop smiling. It's your best accessory!</p>
+    <div class="btn-row"><button class="btn violet" id="toMonkeys" type="button">Wait, there's more 🐒</button></div>
+  </div>
+</section>
+
+<!-- 4. Monkey business -->
+<section class="screen" id="s4" hidden>
+  <div class="card">
+    <h2>The monkey squad has a message</h2>
+    <p class="lead">They practised their poses all week. Please clap. 👏</p>
+    <div class="monkeys">
+      <div class="monkey"><span class="face" aria-hidden="true">🙈</span><b>See no sadness</b><span>only good vibes</span></div>
+      <div class="monkey"><span class="face" aria-hidden="true">🙉</span><b>Hear no drama</b><span>just party music</span></div>
+      <div class="monkey"><span class="face" aria-hidden="true">🙊</span><b>Speak no stress</b><span>only "yay!"</span></div>
+      <div class="monkey"><span class="face" aria-hidden="true">🐒</span><b>Dance all day</b><span>it's the rule</span></div>
+    </div>
+    <div class="btn-row"><button class="btn yes" id="toPhotos" type="button">Show me the birthday girl 📸</button></div>
+  </div>
+</section>
+
+<!-- 5. The birthday girl -->
+<section class="screen" id="s5" hidden>
+  <div class="card">
+    <h2>The Birthday Queen 👑</h2>
+    <div class="gallery">
+      <figure class="polaroid"><img src="san-1.jpg" alt="San smiling in a cream and maroon saree" loading="lazy"><figcaption>That smile? Illegal. 😌</figcaption></figure>
+      <figure class="polaroid"><img src="san-2.jpg" alt="San in a purple top and yellow skirt in front of a carved wooden door" loading="lazy"><figcaption>Main character energy ✨</figcaption></figure>
+    </div>
+    <p class="scribble" id="cakeHint" aria-live="polite">Make a wish and tap the candles to blow them out!</p>
+    <div class="cake" aria-label="Birthday cake">
+      <div class="candles" id="candles">
+        <button class="candle" type="button" aria-label="Blow out candle 1"><span class="flame"></span></button>
+        <button class="candle" type="button" aria-label="Blow out candle 2"><span class="flame"></span></button>
+        <button class="candle" type="button" aria-label="Blow out candle 3"><span class="flame"></span></button>
+      </div>
+      <div class="layer l2"></div>
+      <div class="layer l1"></div>
+      <div class="plate"></div>
+    </div>
+    <p class="final">Keep smiling, San. The world looks better when you do. 💛</p>
+    <div class="btn-row"><button class="btn no" id="replay" type="button">Watch it again 🔁</button></div>
+  </div>
+</section>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Balloons ---------- */
+  const balloonColors = ["#FF4F9A", "#6A2BD9", "#F6B90F", "#FFB3D1", "#B794FF"];
+  for (let i = 0; i < 9; i++) {
+    const b = document.createElement("span");
+    b.className = "balloon";
+    b.style.left = (i * 11 + Math.random() * 6) + "%";
+    b.style.setProperty("--b", balloonColors[i % balloonColors.length]);
+    b.style.setProperty("--t", (11 + Math.random() * 8) + "s");
+    b.style.setProperty("--d", (-Math.random() * 18) + "s");
+    $("balloons").appendChild(b);
+  }
+
+  /* ---------- Screen flow ---------- */
+  const screens = ["s1", "s2", "s3", "s4", "s5"];
+  function show(id) {
+    screens.forEach((s) => { $(s).hidden = s !== id; $(s).classList.remove("enter"); });
+    void $(id).offsetWidth;
+    $(id).classList.add("enter");
+    const idx = screens.indexOf(id);
+    [...$("dots").children].forEach((d, i) => d.classList.toggle("on", i === idx));
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Screen 1: the runaway Yes button ---------- */
+  const yesBtn = $("yesBtn"), noBtn = $("noBtn"), tease = $("tease");
+  let yesTries = 0, noTries = 0;
+  const dodgeLines = ["Hehe, not so fast! 🙈", "Oops, missed again! One more try 🐒"];
+  const noLines = ["Wrong button, try again 😤", "Are you sure? Think again 🥺", "That button is just for decoration 😌", "Nope, not accepting that answer 🙅‍♀️"];
+
+  function place(btn, x, y) {
+    btn.classList.add("floating");
+    btn.style.left = x + "px";
+    btn.style.top = y + "px";
+  }
+
+  yesBtn.addEventListener("click", () => {
+    if (yesTries < 2) {
+      const yr = yesBtn.getBoundingClientRect();
+      const nr = noBtn.getBoundingClientRect();
+      // No slides into the spot Yes just left...
+      place(noBtn, nr.left, nr.top);
+      place(yesBtn, yr.left, yr.top);
+      void yesBtn.offsetWidth; // commit start positions so the move animates
+      {
+        place(noBtn, yr.left + (yr.width - nr.width) / 2, yr.top);
+        // ...and Yes runs off somewhere else on screen
+        const pad = 20, w = yr.width, h = yr.height;
+        let x, y, tries = 0;
+        do {
+          x = pad + Math.random() * (innerWidth - w - pad * 2);
+          y = 70 + Math.random() * (innerHeight - h - 90);
+          tries++;
+        } while (Math.hypot(x - yr.left, y - yr.top) < 160 && tries < 30);
+        place(yesBtn, x, y);
+      }
+      tease.textContent = dodgeLines[yesTries];
+      yesTries++;
+      return;
+    }
+    burst(160);
+    show("s2");
+  });
+
+  noBtn.addEventListener("click", () => {
+    tease.textContent = noLines[noTries % noLines.length];
+    noTries++;
+    yesBtn.style.fontSize = Math.min(1.15 + noTries * 0.15, 1.9) + "rem";
+    noBtn.style.fontSize = Math.max(1.15 - noTries * 0.12, 0.7) + "rem";
+  });
+
+  function resetScreen1() {
+    yesTries = 0; noTries = 0; tease.textContent = "";
+    [yesBtn, noBtn].forEach((b) => { b.classList.remove("floating"); b.style.left = b.style.top = b.style.fontSize = ""; });
+  }
+
+  /* ---------- Screen 2: gift ---------- */
+  $("gift").addEventListener("click", () => {
+    $("gift").classList.add("open");
+    burst(220);
+    setTimeout(() => show("s3"), reduce ? 0 : 900);
+  });
+
+  /* ---------- Screen 3 & 4 ---------- */
+  $("toMonkeys").addEventListener("click", () => show("s4"));
+  $("toPhotos").addEventListener("click", () => { show("s5"); burst(200); });
+
+  /* ---------- Screen 5: candles ---------- */
+  document.querySelectorAll(".candle").forEach((c) => c.addEventListener("click", () => {
+    if (c.classList.contains("out")) return;
+    c.classList.add("out");
+    c.setAttribute("aria-label", "Candle blown out");
+    if (document.querySelectorAll(".candle:not(.out)").length === 0) {
+      $("cakeHint").textContent = "Wish granted! Happy birthday, San! 🎉";
+      burst(300);
+    }
+  }));
+
+  $("replay").addEventListener("click", () => {
+    resetScreen1();
+    $("gift").classList.remove("open");
+    document.querySelectorAll(".candle").forEach((c) => { c.classList.remove("out"); });
+    $("cakeHint").textContent = "Make a wish and tap the candles to blow them out!";
+    show("s1");
+  });
+
+  /* ---------- Confetti ---------- */
+  const canvas = $("confetti"), ctx = canvas.getContext("2d");
+  let pieces = [], running = false;
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  addEventListener("resize", resize); resize();
+  const confettiColors = ["#FF4F9A", "#6A2BD9", "#F6B90F", "#FFB3D1", "#B794FF", "#2B1745"];
+  function burst(n) {
+    if (reduce) return;
+    for (let i = 0; i < n; i++) {
+      pieces.push({
+        x: innerWidth / 2 + (Math.random() - .5) * 140, y: innerHeight * .4,
+        vx: (Math.random() - .5) * 18, vy: -Math.random() * 15 - 4,
+        w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
+        r: Math.random() * 6, vr: (Math.random() - .5) * .3,
+        c: confettiColors[(Math.random() * confettiColors.length) | 0],
+        heart: Math.random() < .15, life: 0,
+      });
+    }
+    if (!running) { running = true; requestAnimationFrame(tick); }
+  }
+  function tick() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    pieces = pieces.filter((p) => p.y < innerHeight + 40 && p.life < 420);
+    for (const p of pieces) {
+      p.vy += .3; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c;
+      if (p.heart) { ctx.font = "16px sans-serif"; ctx.fillText("💖", -8, 6); }
+      else ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.life * .1)));
+      ctx.restore();
+    }
+    if (pieces.length) requestAnimationFrame(tick);
+    else { running = false; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+</script>
+</body>
+</html>
